@@ -282,11 +282,13 @@ export function LoginForm() {
             </form>
 
             <form action="index.html" autoComplete="off" className="sign-up-form">
-              <div className="logo">
-                <img src="./assets/logo.png" alt="easyclassName" className="w-100 h-100" />
-              </div>
-
              
+
+              <div className="heading">
+                <h2>Get Started</h2>
+                <h6>Already have an account?</h6>
+                <a href="#" className="toggle" onClick={toggleSignUpMode}>Sign in</a>
+              </div>
 
               <div className="actual-form">
                 <div className="input-wrap">
