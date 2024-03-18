@@ -1,7 +1,6 @@
 import { Toaster } from 'react-hot-toast'
 
-import { SideWelcome } from '../components/LoginComponents/SideWelcome'
-import { LoginForm } from '../components/LoginComponents/LoginForm'
+import { LoginForm } from '@/components/LoginComponents/LoginForm'
 
 export default function LoginPage() {
   return (
