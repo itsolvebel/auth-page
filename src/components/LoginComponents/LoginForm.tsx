@@ -12,8 +12,7 @@ type LoginForm = {
 }
 
 export function LoginForm() {
-    const router = useRouter()
-
+    const router = useRouter();
     const [form, setForm] = useState<LoginForm>(
         {email_or_username: '', password: ''},
     )
@@ -32,14 +31,15 @@ export function LoginForm() {
     }
 
     const handleOnChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-        const { id, value } = e.target
-        setForm((prev) => ({ ...prev, [id]: value }))
+        const {id, value} = e.target
+        setForm((prev) => ({...prev, [id]: value}))
     }
 
     const handleOnSubmit = (e: React.FormEvent) => {
         e.preventDefault()
         login(form).then(res => {
-            router.replace('/')
+            const url = "https://app.itsolve.be"
+            router.push(url)
         }).catch(error => {
             if (error instanceof FetchingError) {
                 if (error.statusCode === 401) {
