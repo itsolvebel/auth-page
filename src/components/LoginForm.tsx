@@ -5,6 +5,7 @@ import toast from 'react-hot-toast'
 import { useRouter } from 'next/router'
 import { fetcher } from 'app/lib/fetcher'
 import { FetchingError } from 'app/lib/errors'
+import { useSearchParams } from 'next/navigation'
 
 type LoginForm = {
   email_or_username: string
@@ -13,6 +14,7 @@ type LoginForm = {
 
 export function LoginForm() {
   const router = useRouter()
+  const searchParams = useSearchParams()
   const [form, setForm] = useState<LoginForm>({
     email_or_username: '',
     password: '',
@@ -40,8 +42,9 @@ export function LoginForm() {
     e.preventDefault()
     login(form)
       .then(res => {
-        const url = 'https://app.itsolve.be'
-        router.push(url)
+        const url = searchParams.get('redirect') || '/'
+        const prefix = url.includes('localhost') ? 'http://' : 'https://'
+        router.push(`${prefix}${url}`)
       })
       .catch(error => {
         if (error instanceof FetchingError) {
@@ -114,7 +117,6 @@ export function LoginForm() {
   const toggleSignUpMode = (e: React.MouseEvent<HTMLAnchorElement>) => {
     e.preventDefault()
     e.stopPropagation()
-    console.log('toggleSignUpMode is called')
     setSignUpMode(prevMode => !prevMode)
   }
 
@@ -152,11 +154,7 @@ export function LoginForm() {
       <div className="box">
         <div className="inner-box">
           <div className="forms-wrap">
-            <form
-              action="index.html"
-              autoComplete="off"
-              className="sign-in-form"
-            >
+            <form autoComplete="off" className="sign-in-form">
               <div className="logo">
                 <img
                   src="./assets/logo.png"
@@ -221,11 +219,7 @@ export function LoginForm() {
               </div>
             </form>
 
-            <form
-              action="index.html"
-              autoComplete="off"
-              className="sign-up-form"
-            >
+            <form autoComplete="off" className="sign-up-form">
               <div className="heading">
                 <h2>Get Started</h2>
                 <h6>Already have an account?</h6>
