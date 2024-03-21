@@ -23,6 +23,10 @@ export function LoginForm() {
   const [sliderPosition, setSliderPosition] = useState<number>(0)
   const [requirements, setRequirements] = useState<string[]>([''])
 
+  type LoginResponse = {
+    access_token: string
+  }
+
   async function login(form: LoginForm) {
     const options: RequestInit = {
       credentials: 'include',
@@ -30,7 +34,7 @@ export function LoginForm() {
         'Content-Type': 'application/json',
       },
     }
-    return await fetcher.post('/login', form, options)
+    return await fetcher.post<LoginResponse>('/login', form, options)
   }
 
   const handleOnChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -42,7 +46,11 @@ export function LoginForm() {
     e.preventDefault()
     login(form)
       .then(res => {
-        const url = searchParams.get('redirect') || '/'
+        const url = searchParams.get('redirect')
+        if (!url) {
+          router.push('/')
+          return
+        }
         const prefix = url.includes('localhost') ? 'http://' : 'https://'
         router.push(`${prefix}${url}`)
       })

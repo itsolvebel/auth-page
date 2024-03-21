@@ -1,32 +1,46 @@
 import { FetchingError } from 'app/lib/errors'
 import { config } from 'app/config'
 
+type Status = 'Ok' | 'Error'
+
+type ReturnType<T> = {
+  status: Status
+  data: T
+  errors: any
+}
+
 type Fetcher = {
-  get<T = any>(resource: string, options?: RequestInit): Promise<T>
-  post<T = any>(resource: string, body: any, options?: RequestInit): Promise<T>
-  put<T = any>(resource: string, body: any, options?: RequestInit): Promise<T>
-  delete<T = any>(
+  get<T>(resource: string, options?: RequestInit): Promise<ReturnType<T>>
+  post<T>(
     resource: string,
     body: any,
     options?: RequestInit
-  ): Promise<T>
+  ): Promise<ReturnType<T>>
+  put<T>(
+    resource: string,
+    body: any,
+    options?: RequestInit
+  ): Promise<ReturnType<T>>
+  delete<T>(
+    resource: string,
+    body: any,
+    options?: RequestInit
+  ): Promise<ReturnType<T>>
 }
 
-let token: string
 const Fetcher = (baseUrl: string): Fetcher => {
-  const makeRequest = async <T = any>(
+  const makeRequest = async <T>(
     method: string,
     resource: string,
     options?: RequestInit,
     body?: any
-  ): Promise<T> => {
+  ): Promise<ReturnType<T>> => {
     resource = filterResourceString(resource)
     const requestOptions: RequestInit = {
       credentials: 'include',
       method,
       headers: {
         'Content-Type': 'application/json',
-        Authorization: `Bearer ${token || localStorage.getItem('token')}`,
         ...options?.headers,
       },
       body: body ? JSON.stringify(body) : undefined,
@@ -58,39 +72,38 @@ const Fetcher = (baseUrl: string): Fetcher => {
       }
     }
     if (contentType && contentType.includes('application/json')) {
-      return await response.json()
-    } else {
-      return response as any
+      return (await response.json()) as ReturnType<T>
     }
+    return { status: 'Ok', data: {} as T, errors: {} }
   }
 
   const get = async <T>(
     resource: string,
     options?: RequestInit
-  ): Promise<T> => {
-    return makeRequest('GET', resource, options)
+  ): Promise<ReturnType<T>> => {
+    return makeRequest<T>('GET', resource, options)
   }
 
-  const post = async (
+  const post = async <T>(
     resource: string,
     body: any,
     options?: RequestInit
-  ): Promise<any> => {
-    return makeRequest('POST', resource, options, body)
+  ): Promise<ReturnType<T>> => {
+    return makeRequest<T>('POST', resource, options, body)
   }
-  const put = async (
+  const put = async <T>(
     resource: string,
     body: any,
     options?: RequestInit
-  ): Promise<any> => {
-    return makeRequest('PUT', resource, options, body)
+  ): Promise<ReturnType<T>> => {
+    return makeRequest<T>('PUT', resource, options, body)
   }
 
-  const deleteRequest = async (
+  const deleteRequest = async <T>(
     resource: string,
     options?: RequestInit
-  ): Promise<any> => {
-    return makeRequest('DELETE', resource, options)
+  ): Promise<ReturnType<T>> => {
+    return makeRequest<T>('DELETE', resource, options)
   }
 
   return { get, post, put, delete: deleteRequest }
